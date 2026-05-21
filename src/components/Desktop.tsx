@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import NPC from './NPC';
+import TownSquare from './TownSquare';
 
 interface WindowState {
   id: string;
@@ -21,13 +21,6 @@ interface LogEntry {
   message: string;
 }
 
-const NPCS = [
-  { id: 'karen', name: 'Researcher Karen', role: 'Research Agent', x: 15, y: 20, color: '#ff6b9d' },
-  { id: 'chad', name: 'Coder Chad', role: 'Execution Agent', x: 75, y: 20, color: '#4ecdc4' },
-  { id: 'alice', name: 'Analyst Alice', role: 'Analysis Agent', x: 15, y: 70, color: '#ffe66d' },
-  { id: 'bob', name: 'Executor Bob', role: 'Orchestrator', x: 75, y: 70, color: '#a8dadc' },
-];
-
 export default function Desktop() {
   const [windows, setWindows] = useState<WindowState[]>([
     { id: 'control', title: 'AgentVille Control Panel', x: 40, y: 40, width: 320, height: 240, minimized: false, zIndex: 10 },
@@ -40,8 +33,6 @@ export default function Desktop() {
     { id: '3', timestamp: '23:41:07', agent: 'CHAD', message: 'Execution engine ready' },
   ]);
   const [missionActive, setMissionActive] = useState(false);
-  const [selectedNPC, setSelectedNPC] = useState<string | null>(null);
-  const [connections, setConnections] = useState<Array<{from: string, to: string}>>([]);
   const zCounter = useRef(20);
 
   const bringToFront = (id: string) => {
@@ -66,48 +57,29 @@ export default function Desktop() {
   const launchMission = () => {
     if (missionActive) return;
     setMissionActive(true);
-    setConnections([]);
     
     addLog('SYSTEM', 'MISSION LAUNCH: Multi-agent research task initiated');
     
     setTimeout(() => {
       addLog('KAREN', 'Scanning knowledge base...');
-      setConnections([{from: 'karen', to: 'alice'}]);
     }, 600);
     
     setTimeout(() => {
       addLog('ALICE', 'Analyzing data patterns...');
-      setConnections(prev => [...prev, {from: 'alice', to: 'chad'}]);
     }, 1200);
     
     setTimeout(() => {
       addLog('CHAD', 'Executing code generation...');
-      setConnections(prev => [...prev, {from: 'chad', to: 'bob'}]);
     }, 1800);
     
     setTimeout(() => {
       addLog('BOB', 'Orchestrating final synthesis...');
-      setConnections([
-        {from: 'karen', to: 'bob'},
-        {from: 'alice', to: 'bob'},
-        {from: 'chad', to: 'bob'},
-      ]);
     }, 2400);
     
     setTimeout(() => {
       addLog('SYSTEM', 'Mission complete. Results aggregated.');
       setMissionActive(false);
-      setTimeout(() => setConnections([]), 2000);
     }, 3200);
-  };
-
-  const handleNPCClick = (npcId: string) => {
-    setSelectedNPC(npcId);
-    const npc = NPCS.find(n => n.id === npcId);
-    if (npc) {
-      addLog(npc.name.split(' ')[1].toUpperCase(), `Status check: ${npc.role} ready`);
-    }
-    setTimeout(() => setSelectedNPC(null), 3000);
   };
 
   return (
@@ -204,102 +176,8 @@ export default function Desktop() {
               )}
               
               {win.id === 'town' && (
-                <div className="relative w-full h-full bg-[#2a4d3a] town-grid overflow-hidden">
-                  {/* Pixel Town Background */}
-                  <div className="absolute inset-0 opacity-20">
-                    <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-[#1a3a2a]" />
-                    <div className="absolute top-[30%] left-[10%] w-8 h-12 bg-[#4a5d4a] win95-border" />
-                    <div className="absolute top-[25%] right-[15%] w-10 h-16 bg-[#5a6d5a] win95-border" />
-                    <div className="absolute bottom-[40%] left-[40%] w-16 h-8 bg-[#3a4a3a] win95-border" />
-                  </div>
-
-                  {/* Connection Lines SVG */}
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
-                    {connections.map((conn, idx) => {
-                      const from = NPCS.find(n => n.id === conn.from);
-                      const to = NPCS.find(n => n.id === conn.to);
-                      if (!from || !to) return null;
-                      return (
-                        <g key={idx}>
-                          <line
-                            x1={`${from.x}%`}
-                            y1={`${from.y}%`}
-                            x2={`${to.x}%`}
-                            y2={`${to.y}%`}
-                            stroke="#00ff88"
-                            strokeWidth="2"
-                            strokeDasharray="4 2"
-                            className="pulse"
-                            filter="url(#glow)"
-                          />
-                          <circle
-                            cx={`${from.x}%`}
-                            cy={`${from.y}%`}
-                            r="3"
-                            fill="#00ff88"
-                            className="pulse"
-                          />
-                        </g>
-                      );
-                    })}
-                    <defs>
-                      <filter id="glow">
-                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                        <feMerge>
-                          <feMergeNode in="coloredBlur"/>
-                          <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                      </filter>
-                    </defs>
-                  </svg>
-
-                  {/* NPCs */}
-                  {NPCS.map(npc => (
-                    <div
-                      key={npc.id}
-                      className="absolute"
-                      style={{ 
-                        left: `${npc.x}%`, 
-                        top: `${npc.y}%`,
-                        transform: 'translate(-50%, -50%)',
-                        zIndex: 10
-                      }}
-                    >
-                      <NPC
-                        name={npc.name}
-                        role={npc.role}
-                        color={npc.color}
-                        active={missionActive}
-                        selected={selectedNPC === npc.id}
-                        onClick={() => handleNPCClick(npc.id)}
-                      />
-                      {selectedNPC === npc.id && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="absolute top-full mt-2 left-1/2 -translate-x-1/2 whitespace-nowrap"
-                        >
-                          <div className="bg-[#ffffe1] text-black text-[9px] px-2 py-1 win95-border max-w-[140px]">
-                            <div className="font-bold">{npc.name}</div>
-                            <div className="text-[8px] text-gray-700">{npc.role}</div>
-                            <div className="mt-1 text-[8px]">
-                              Status: {missionActive ? 'WORKING' : 'IDLE'}
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Mission Status Overlay */}
-                  {missionActive && (
-                    <div className="absolute top-2 left-2 right-2">
-                      <div className="bg-black/80 text-[#00ff00] text-[9px] font-mono px-2 py-1 border border-[#00ff00]/50">
-                        MISSION IN PROGRESS • AGENTS SYNCING...
-                      </div>
-                    </div>
-                  )}
+                <div className="relative w-full h-full bg-[#008080] flex items-center justify-center p-2">
+                  <TownSquare />
                 </div>
               )}
             </div>
