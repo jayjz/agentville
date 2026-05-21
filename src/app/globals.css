@@ -1,43 +1,237 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --win95-gray: #c0c0c0;
+  --win95-dark-gray: #808080;
+  --win95-blue: #000080;
+  --win95-teal: #008080;
+  --win95-white: #ffffff;
+  --win95-black: #000000;
+  --win95-light-gray: #dfdfdf;
+}
+
+* {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--win95-teal);
+  font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, sans-serif;
+  font-size: 11px;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='22'><path fill='white' stroke='black' stroke-width='1' d='M1 1 L1 18 L5 12 L8 20 L10 19 L7 11 L13 11 Z'/></svg>") 0 0, auto;
+  user-select: none;
+}
+
+/* CRT Scanlines & Phosphor Glow */
 .crt::before {
   content: "";
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
-  pointer-events: none; z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  animation: flicker 0.15s infinite linear;
 }
 
-:root {
-  --win95-gray: #c0c0c0;
-  --win95-blue: #000080;
-  --win95-teal: #008080;
+.crt::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+  pointer-events: none;
+  z-index: 9998;
 }
 
-body {
-  background-color: var(--win95-teal);
-  font-family: 'MS Sans Serif', sans-serif;
-  image-rendering: pixelated;
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  5% { opacity: 0.95; }
+  10% { opacity: 0.98; }
+  15% { opacity: 0.94; }
+  20% { opacity: 1; }
+  100% { opacity: 0.97; }
+}
+
+/* Windows 95 Beveled Borders */
+.win95-border {
+  border-top: 2px solid var(--win95-white);
+  border-left: 2px solid var(--win95-white);
+  border-right: 2px solid var(--win95-dark-gray);
+  border-bottom: 2px solid var(--win95-dark-gray);
+  background: var(--win95-gray);
+}
+
+.win95-border-inset {
+  border-top: 2px solid var(--win95-dark-gray);
+  border-left: 2px solid var(--win95-dark-gray);
+  border-right: 2px solid var(--win95-white);
+  border-bottom: 2px solid var(--win95-white);
+  background: var(--win95-gray);
 }
 
 .win95-window {
   background: var(--win95-gray);
-  border-top: 2px solid #fff;
-  border-left: 2px solid #fff;
-  border-right: 2px solid #808080;
-  border-bottom: 2px solid #808080;
-  box-shadow: 2px 2px 0 #000;
+  border-top: 2px solid var(--win95-white);
+  border-left: 2px solid var(--win95-white);
+  border-right: 2px solid var(--win95-black);
+  border-bottom: 2px solid var(--win95-black);
+  box-shadow: 
+    inset -1px -1px 0 var(--win95-dark-gray),
+    inset 1px 1px 0 var(--win95-light-gray),
+    2px 2px 0 rgba(0,0,0,0.3);
 }
 
 .win95-titlebar {
-  background: var(--win95-blue);
+  background: linear-gradient(90deg, #000080 0%, #0000cd 100%);
   color: white;
-  padding: 2px 4px;
+  padding: 2px 3px;
   font-weight: bold;
   font-size: 11px;
+  height: 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: 'MS Sans Serif', sans-serif;
+  user-select: none;
+}
+
+.win95-titlebar-inactive {
+  background: linear-gradient(90deg, #808080 0%, #a0a0a0 100%);
+}
+
+.win95-button {
+  background: var(--win95-gray);
+  border-top: 1px solid var(--win95-white);
+  border-left: 1px solid var(--win95-white);
+  border-right: 1px solid var(--win95-black);
+  border-bottom: 1px solid var(--win95-black);
+  box-shadow: inset -1px -1px 0 var(--win95-dark-gray), inset 1px 1px 0 var(--win95-light-gray);
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: 'MS Sans Serif', sans-serif;
+  min-width: 75px;
+  text-align: center;
+}
+
+.win95-button:active {
+  border-top: 1px solid var(--win95-black);
+  border-left: 1px solid var(--win95-black);
+  border-right: 1px solid var(--win95-white);
+  border-bottom: 1px solid var(--win95-white);
+  box-shadow: inset 1px 1px 0 var(--win95-dark-gray);
+  padding-top: 5px;
+  padding-left: 9px;
+  padding-bottom: 3px;
+  padding-right: 7px;
+}
+
+/* Taskbar */
+.win95-taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: var(--win95-gray);
+  border-top: 2px solid var(--win95-white);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  gap: 2px;
+  z-index: 10000;
+}
+
+.win95-start-button {
+  height: 22px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+/* Pixel Font Utility */
+.pixel-font {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+  image-rendering: pixelated;
+}
+
+/* Town Square Grid */
+.town-grid {
+  background-image: 
+    linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Glow Effects */
+.glow-blue {
+  filter: drop-shadow(0 0 4px #0080ff) drop-shadow(0 0 8px #0080ff);
+}
+
+.glow-green {
+  filter: drop-shadow(0 0 4px #00ff00) drop-shadow(0 0 8px #00ff00);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.pulse {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+/* Scrollbars - Windows 95 Style */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--win95-gray);
+  border-left: 1px solid var(--win95-dark-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--win95-gray);
+  border-top: 1px solid var(--win95-white);
+  border-left: 1px solid var(--win95-white);
+  border-right: 1px solid var(--win95-black);
+  border-bottom: 1px solid var(--win95-black);
+  box-shadow: inset -1px -1px 0 var(--win95-dark-gray), inset 1px 1px 0 var(--win95-light-gray);
+}
+
+::-webkit-scrollbar-button {
+  background: var(--win95-gray);
+  border-top: 1px solid var(--win95-white);
+  border-left: 1px solid var(--win95-white);
+  border-right: 1px solid var(--win95-black);
+  border-bottom: 1px solid var(--win95-black);
+  height: 16px;
 }
