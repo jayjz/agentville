@@ -177,11 +177,7 @@ export default function Desktop() {
               
               {win.id === 'town' && (
                 <div className="relative w-full h-full bg-[#008080] flex items-center justify-center p-2">
-                  <TownSquare 
-                    missionActive={missionActive}
-                    onAgentClick={(name, role) => addLog(name, `Clicked - ${role}`)}
-                    onMissionComplete={() => setMissionActive(false)}
-                  />
+                  <TownSquare />
                 </div>
               )}
             </div>
