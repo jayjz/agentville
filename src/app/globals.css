@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,17 +8,24 @@
 :root {
   --win95-gray: #c0c0c0;
   --win95-dark-gray: #808080;
+  --win95-darker-gray: #404040;
   --win95-blue: #000080;
+  --win95-bright-blue: #0000ff;
   --win95-teal: #008080;
   --win95-white: #ffffff;
   --win95-black: #000000;
   --win95-light-gray: #dfdfdf;
+  --win95-button-face: #c0c0c0;
+  --win95-button-highlight: #ffffff;
+  --win95-button-shadow: #808080;
+  --win95-button-dark-shadow: #404040;
 }
 
 * {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+  box-sizing: border-box;
 }
 
 html, body {
@@ -26,212 +34,803 @@ html, body {
   height: 100%;
   overflow: hidden;
   background-color: var(--win95-teal);
-  font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, sans-serif;
+  font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, 'Segoe UI', sans-serif;
   font-size: 11px;
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='22'><path fill='white' stroke='black' stroke-width='1' d='M1 1 L1 18 L5 12 L8 20 L10 19 L7 11 L13 11 Z'/></svg>") 0 0, auto;
+  font-weight: 400;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='22' viewBox='0 0 16 22'><path fill='white' stroke='black' stroke-width='1' d='M1 1 L1 16 L4 11 L7 19 L9 18 L6 10 L12 10 Z'/></svg>") 0 0, auto;
   user-select: none;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  text-rendering: optimizeSpeed;
 }
 
-/* CRT Scanlines & Phosphor Glow */
-.crt::before {
+/* ============================================================================
+   AUTHENTIC CRT MONITOR EFFECT
+   ============================================================================ */
+
+.crt-monitor {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Screen curvature */
+.crt-monitor::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 2px
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 65%,
+    rgba(0, 0, 0, 0.15) 85%,
+    rgba(0, 0, 0, 0.4) 100%
   );
   pointer-events: none;
-  z-index: 9999;
-  animation: flicker 0.15s infinite linear;
+  z-index: 100000;
+  border-radius: 20px / 15px;
 }
 
-.crt::after {
+/* CRT Scanlines - Authentic phosphor lines */
+.crt-scanlines::after {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 3px,
+    transparent 3px,
+    transparent 4px
+  );
+  pointer-events: none;
+  z-index: 99999;
+  animation: scanlines-move 8s linear infinite;
+}
+
+@keyframes scanlines-move {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* Phosphor glow and flicker */
+.crt-phosphor {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99998;
+  background: 
+    radial-gradient(ellipse at center, rgba(120, 180, 255, 0.03) 0%, transparent 70%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.005) 1px,
+      rgba(255, 255, 255, 0.005) 2px
+    );
+  animation: phosphor-flicker 0.12s infinite steps(2);
+  mix-blend-mode: screen;
+}
+
+@keyframes phosphor-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.97; }
+  52% { opacity: 0.99; }
+  54% { opacity: 0.96; }
+  56% { opacity: 1; }
+}
+
+/* Chromatic aberration */
+.crt-chroma {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99997;
+  opacity: 0.4;
+  mix-blend-mode: screen;
+  background: 
+    linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 0, 0, 0.01) 0.5%, 
+      transparent 1%,
+      transparent 99%,
+      rgba(0, 255, 255, 0.01) 99.5%,
+      transparent 100%
+    );
+}
+
+/* Subtle noise texture */
+.crt-noise::before {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 99996;
+  animation: noise-drift 0.2s infinite;
+  opacity: 0.6;
+  mix-blend-mode: multiply;
+}
+
+@keyframes noise-drift {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-1%, -1%); }
+  20% { transform: translate(1%, 0); }
+  30% { transform: translate(0, 1%); }
+  40% { transform: translate(-1%, 1%); }
+  50% { transform: translate(1%, -1%); }
+  60% { transform: translate(0, 0); }
+  70% { transform: translate(1%, 1%); }
+  80% { transform: translate(-1%, 0); }
+  90% { transform: translate(0, -1%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ============================================================================
+   AUTHENTIC WINDOWS 95 UI ELEMENTS
+   ============================================================================ */
+
+/* Perfect 3D beveled border - OUTSET (raised) */
+.win95-border-outset {
+  border-top: 1px solid var(--win95-button-highlight);
+  border-left: 1px solid var(--win95-button-highlight);
+  border-right: 1px solid var(--win95-button-dark-shadow);
+  border-bottom: 1px solid var(--win95-button-dark-shadow);
+  box-shadow: 
+    inset -1px -1px 0 var(--win95-button-shadow),
+    inset 1px 1px 0 var(--win95-button-face);
+  background: var(--win95-button-face);
+}
+
+/* Perfect 3D beveled border - INSET (sunken) */
+.win95-border-inset {
+  border-top: 1px solid var(--win95-button-shadow);
+  border-left: 1px solid var(--win95-button-shadow);
+  border-right: 1px solid var(--win95-button-highlight);
+  border-bottom: 1px solid var(--win95-button-highlight);
+  box-shadow: 
+    inset 1px 1px 0 var(--win95-button-dark-shadow),
+    inset -1px -1px 0 var(--win95-button-face);
+  background: var(--win95-button-face);
+}
+
+/* Window frame - authentic 3D */
+.win95-window {
+  background: var(--win95-button-face);
+  border-top: 1px solid var(--win95-button-highlight);
+  border-left: 1px solid var(--win95-button-highlight);
+  border-right: 1px solid var(--win95-button-dark-shadow);
+  border-bottom: 1px solid var(--win95-button-dark-shadow);
+  box-shadow: 
+    inset -1px -1px 0 var(--win95-button-shadow),
+    inset 1px 1px 0 var(--win95-white),
+    1px 1px 0 rgba(0, 0, 0, 0.5);
+  padding: 2px;
+}
+
+.win95-window-inner {
   width: 100%;
   height: 100%;
-  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
-  pointer-events: none;
-  z-index: 9998;
+  background: var(--win95-button-face);
+  border-top: 1px solid var(--win95-button-shadow);
+  border-left: 1px solid var(--win95-button-shadow);
+  border-right: 1px solid var(--win95-white);
+  border-bottom: 1px solid var(--win95-white);
 }
 
-@keyframes flicker {
-  0% { opacity: 0.97; }
-  5% { opacity: 0.95; }
-  10% { opacity: 0.98; }
-  15% { opacity: 0.94; }
-  20% { opacity: 1; }
-  100% { opacity: 0.97; }
-}
-
-/* Windows 95 Beveled Borders */
-.win95-border {
-  border-top: 2px solid var(--win95-white);
-  border-left: 2px solid var(--win95-white);
-  border-right: 2px solid var(--win95-dark-gray);
-  border-bottom: 2px solid var(--win95-dark-gray);
-  background: var(--win95-gray);
-}
-
-.win95-border-inset {
-  border-top: 2px solid var(--win95-dark-gray);
-  border-left: 2px solid var(--win95-dark-gray);
-  border-right: 2px solid var(--win95-white);
-  border-bottom: 2px solid var(--win95-white);
-  background: var(--win95-gray);
-}
-
-.win95-window {
-  background: var(--win95-gray);
-  border-top: 2px solid var(--win95-white);
-  border-left: 2px solid var(--win95-white);
-  border-right: 2px solid var(--win95-black);
-  border-bottom: 2px solid var(--win95-black);
-  box-shadow: 
-    inset -1px -1px 0 var(--win95-dark-gray),
-    inset 1px 1px 0 var(--win95-light-gray),
-    2px 2px 0 rgba(0,0,0,0.3);
-}
-
+/* Title bar - authentic gradient */
 .win95-titlebar {
-  background: linear-gradient(90deg, #000080 0%, #0000cd 100%);
+  background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
   color: white;
-  padding: 2px 3px;
-  font-weight: bold;
-  font-size: 11px;
+  padding: 0 2px;
   height: 18px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-family: 'MS Sans Serif', sans-serif;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 11px;
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
   user-select: none;
+  letter-spacing: 0;
+  -webkit-font-smoothing: none;
 }
 
 .win95-titlebar-inactive {
-  background: linear-gradient(90deg, #808080 0%, #a0a0a0 100%);
+  background: linear-gradient(90deg, #808080 0%, #a8a8a8 100%);
+  color: #c0c0c0;
 }
 
-.win95-button {
-  background: var(--win95-gray);
-  border-top: 1px solid var(--win95-white);
-  border-left: 1px solid var(--win95-white);
-  border-right: 1px solid var(--win95-black);
-  border-bottom: 1px solid var(--win95-black);
-  box-shadow: inset -1px -1px 0 var(--win95-dark-gray), inset 1px 1px 0 var(--win95-light-gray);
-  padding: 4px 8px;
-  font-size: 11px;
-  cursor: pointer;
+.win95-titlebar-text {
+  padding: 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 100%;
+}
+
+/* Window control buttons - pixel perfect */
+.win95-title-button {
+  width: 16px;
+  height: 14px;
+  background: var(--win95-button-face);
+  border: none;
+  padding: 0;
+  margin-left: 2px;
+  position: relative;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='22' viewBox='0 0 16 22'><path fill='white' stroke='black' stroke-width='1' d='M1 1 L1 16 L4 11 L7 19 L9 18 L6 10 L12 10 Z'/></svg>") 0 0, pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.win95-title-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+  box-shadow: inset -1px -1px 0 #404040, inset 1px 1px 0 #dfdfdf;
+}
+
+.win95-title-button:active::before {
+  border-top: 1px solid #404040;
+  border-left: 1px solid #404040;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
+  box-shadow: inset 1px 1px 0 #808080;
+}
+
+.win95-title-button span {
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  line-height: 1;
+  font-weight: bold;
+  color: black;
   font-family: 'MS Sans Serif', sans-serif;
+}
+
+/* Minimize button icon */
+.win95-btn-minimize::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+  right: 3px;
+  height: 2px;
+  background: black;
+  z-index: 1;
+}
+
+/* Maximize button icon */
+.win95-btn-maximize::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 6px;
+  border: 1px solid black;
+  border-top-width: 2px;
+  z-index: 1;
+}
+
+/* Close button icon */
+.win95-btn-close::before {
+  content: "×";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  color: black;
+  font-weight: 400;
+  z-index: 1;
+}
+
+/* Standard button */
+.win95-button {
+  background: var(--win95-button-face);
+  border: none;
+  padding: 4px 12px 4px 12px;
+  font-size: 11px;
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
+  color: black;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='22' viewBox='0 0 16 22'><path fill='white' stroke='black' stroke-width='1' d='M1 1 L1 16 L4 11 L7 19 L9 18 L6 10 L12 10 Z'/></svg>") 0 0, pointer;
+  position: relative;
   min-width: 75px;
+  min-height: 23px;
   text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: none;
 }
 
-.win95-button:active {
-  border-top: 1px solid var(--win95-black);
-  border-left: 1px solid var(--win95-black);
-  border-right: 1px solid var(--win95-white);
-  border-bottom: 1px solid var(--win95-white);
-  box-shadow: inset 1px 1px 0 var(--win95-dark-gray);
+.win95-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid #404040;
+  border-bottom: 1px solid #404040;
+  box-shadow: 
+    inset -1px -1px 0 #808080,
+    inset 1px 1px 0 #dfdfdf;
+  pointer-events: none;
+}
+
+.win95-button:active::before,
+.win95-button.active::before {
+  border-top: 1px solid #404040;
+  border-left: 1px solid #404040;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
+  box-shadow: inset 1px 1px 0 #808080;
+}
+
+.win95-button:active,
+.win95-button.active {
   padding-top: 5px;
-  padding-left: 9px;
+  padding-left: 13px;
   padding-bottom: 3px;
-  padding-right: 7px;
+  padding-right: 11px;
 }
 
-/* Taskbar */
+.win95-button:focus {
+  outline: 1px dotted black;
+  outline-offset: -4px;
+}
+
+.win95-button:disabled {
+  color: #808080;
+  text-shadow: 1px 1px 0 white;
+}
+
+/* Text input field */
+.win95-input {
+  background: white;
+  border-top: 1px solid #808080;
+  border-left: 1px solid #808080;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
+  box-shadow: 
+    inset 1px 1px 0 #404040,
+    inset -1px -1px 0 #dfdfdf;
+  padding: 3px 4px;
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  outline: none;
+}
+
+.win95-input:focus {
+  outline: none;
+}
+
+/* Taskbar - authentic */
 .win95-taskbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   height: 30px;
-  background: var(--win95-gray);
-  border-top: 2px solid var(--win95-white);
+  background: var(--win95-button-face);
+  border-top: 1px solid white;
+  box-shadow: inset 0 1px 0 #dfdfdf;
   display: flex;
   align-items: center;
-  padding: 2px;
+  padding: 2px 2px 2px 2px;
   gap: 2px;
   z-index: 10000;
+  user-select: none;
 }
 
+/* Start button - pixel perfect */
 .win95-start-button {
   height: 22px;
-  padding: 0 4px;
+  padding: 0 4px 0 3px;
   display: flex;
   align-items: center;
   gap: 3px;
   font-weight: bold;
   font-size: 11px;
+  font-family: 'MS Sans Serif', sans-serif;
+  min-width: 54px;
+  position: relative;
+  background: var(--win95-button-face);
+  border: none;
+  cursor: pointer;
 }
 
-/* Pixel Font Utility */
-.pixel-font {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  line-height: 1.5;
-  image-rendering: pixelated;
+.win95-start-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid #404040;
+  border-bottom: 1px solid #404040;
+  box-shadow: 
+    inset -1px -1px 0 #808080,
+    inset 1px 1px 0 #dfdfdf;
+  pointer-events: none;
 }
 
-/* Town Square Grid */
-.town-grid {
-  background-image: 
-    linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
-  background-size: 16px 16px;
+.win95-start-button:active::before {
+  border-top: 1px solid #404040;
+  border-left: 1px solid #404040;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
+  box-shadow: inset 1px 1px 0 #808080;
 }
 
-/* Glow Effects */
-.glow-blue {
-  filter: drop-shadow(0 0 4px #0080ff) drop-shadow(0 0 8px #0080ff);
+/* Taskbar buttons */
+.win95-taskbar-button {
+  height: 22px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-family: 'MS Sans Serif', sans-serif;
+  max-width: 160px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  background: var(--win95-button-face);
+  border: none;
+  cursor: pointer;
 }
 
-.glow-green {
-  filter: drop-shadow(0 0 4px #00ff00) drop-shadow(0 0 8px #00ff00);
+.win95-taskbar-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid #404040;
+  border-bottom: 1px solid #404040;
+  box-shadow: 
+    inset -1px -1px 0 #808080,
+    inset 1px 1px 0 #dfdfdf;
+  pointer-events: none;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+.win95-taskbar-button.active::before {
+  border-top: 1px solid #404040;
+  border-left: 1px solid #404040;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
+  box-shadow: 
+    inset 1px 1px 0 #808080,
+    inset -1px -1px 0 white;
+  background: 
+    linear-gradient(45deg, #c0c0c0 25%, transparent 25%, transparent 75%, #c0c0c0 75%),
+    linear-gradient(45deg, #c0c0c0 25%, transparent 25%, transparent 75%, #c0c0c0 75%);
+  background-size: 2px 2px;
+  background-position: 0 0, 1px 1px;
 }
 
-.pulse {
-  animation: pulse-glow 1.5s ease-in-out infinite;
+/* System tray */
+.win95-tray {
+  height: 22px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  margin-left: auto;
+  min-width: 60px;
+  justify-content: flex-end;
+  position: relative;
+  background: var(--win95-button-face);
 }
 
-/* Scrollbars - Windows 95 Style */
+.win95-tray::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 1px solid #808080;
+  border-left: 1px solid #808080;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
+  box-shadow: inset 1px 1px 0 #404040;
+  pointer-events: none;
+}
+
+/* Desktop icons */
+.desktop-icon {
+  width: 75px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 2px;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='22' viewBox='0 0 16 22'><path fill='white' stroke='black' stroke-width='1' d='M1 1 L1 16 L4 11 L7 19 L9 18 L6 10 L12 10 Z'/></svg>") 0 0, pointer;
+  user-select: none;
+}
+
+.desktop-icon:active {
+  filter: brightness(0.8);
+}
+
+.desktop-icon.selected .desktop-icon-label {
+  background: #000080;
+  color: white;
+}
+
+.desktop-icon-image {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.5));
+}
+
+.desktop-icon-label {
+  color: white;
+  font-size: 11px;
+  font-family: 'MS Sans Serif', sans-serif;
+  text-align: center;
+  line-height: 1.1;
+  padding: 1px 2px;
+  text-shadow: 
+    1px 1px 0 black,
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* Scrollbars - authentic Win95 */
 ::-webkit-scrollbar {
   width: 16px;
   height: 16px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--win95-gray);
-  border-left: 1px solid var(--win95-dark-gray);
+  background: var(--win95-button-face);
+  border-left: 1px solid #808080;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--win95-gray);
-  border-top: 1px solid var(--win95-white);
-  border-left: 1px solid var(--win95-white);
-  border-right: 1px solid var(--win95-black);
-  border-bottom: 1px solid var(--win95-black);
-  box-shadow: inset -1px -1px 0 var(--win95-dark-gray), inset 1px 1px 0 var(--win95-light-gray);
+  background: var(--win95-button-face);
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid #404040;
+  border-bottom: 1px solid #404040;
+  box-shadow: 
+    inset -1px -1px 0 #808080,
+    inset 1px 1px 0 #dfdfdf;
+  min-height: 16px;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #a0a0a0;
 }
 
 ::-webkit-scrollbar-button {
-  background: var(--win95-gray);
-  border-top: 1px solid var(--win95-white);
-  border-left: 1px solid var(--win95-white);
-  border-right: 1px solid var(--win95-black);
-  border-bottom: 1px solid var(--win95-black);
+  background: var(--win95-button-face);
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid #404040;
+  border-bottom: 1px solid #404040;
+  box-shadow: 
+    inset -1px -1px 0 #808080,
+    inset 1px 1px 0 #dfdfdf;
+  width: 16px;
   height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::-webkit-scrollbar-button:active {
+  border-top: 1px solid #404040;
+  border-left: 1px solid #404040;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
+  box-shadow: inset 1px 1px 0 #808080;
+  padding-top: 1px;
+  padding-left: 1px;
+}
+
+::-webkit-scrollbar-button:vertical:decrement::after,
+::-webkit-scrollbar-button:vertical:increment::after,
+::-webkit-scrollbar-button:horizontal:decrement::after,
+::-webkit-scrollbar-button:horizontal:increment::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+::-webkit-scrollbar-button:vertical:decrement::after {
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-bottom: 4px solid black;
+  margin-top: 1px;
+}
+
+::-webkit-scrollbar-button:vertical:increment::after {
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid black;
+  margin-top: 1px;
+}
+
+::-webkit-scrollbar-button:horizontal:decrement::after {
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-right: 4px solid black;
+  margin-left: 1px;
+}
+
+::-webkit-scrollbar-button:horizontal:increment::after {
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-left: 4px solid black;
+  margin-left: 2px;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--win95-button-face);
+}
+
+/* Pixel fonts */
+.pixel-font {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.6;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+}
+
+.vt323 {
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  line-height: 1;
+  -webkit-font-smoothing: none;
+}
+
+/* Utility classes */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Start Menu */
+.start-menu {
+  position: fixed;
+  bottom: 30px;
+  left: 2px;
+  width: 200px;
+  background: var(--win95-button-face);
+  z-index: 10001;
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+}
+
+.start-menu::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 2px solid white;
+  border-left: 2px solid white;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+  box-shadow: 
+    inset -1px -1px 0 #808080,
+    inset 1px 1px 0 #dfdfdf,
+    2px 2px 4px rgba(0,0,0,0.4);
+  pointer-events: none;
+}
+
+.start-menu-sidebar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  background: #808080;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+
+.start-menu-sidebar-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.start-menu-items {
+  margin-left: 24px;
+  padding: 2px 0;
+}
+
+.start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 32px;
+  cursor: pointer;
+  position: relative;
+  height: 32px;
+  color: black;
+}
+
+.start-menu-item:hover {
+  background: #000080;
+  color: white;
+}
+
+.start-menu-item-icon {
+  position: absolute;
+  left: 6px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.start-menu-separator {
+  height: 1px;
+  background: #808080;
+  border-bottom: 1px solid white;
+  margin: 2px 2px 2px 26px;
+}
+
+/* Town grid background */
+.town-grid {
+  background-color: #008080;
+  background-image: 
+    linear-gradient(rgba(0,0,0,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+  image-rendering: pixelated;
+}
+
+/* Animations */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: "█";
+  animation: blink 1s step-end infinite;
+  margin-left: 1px;
 }
