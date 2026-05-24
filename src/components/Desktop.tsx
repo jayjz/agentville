@@ -157,27 +157,166 @@ export default function Desktop() {
     if (missionActive) return;
     setMissionActive(true);
     
-    addLog('SYSTEM', '═══ MISSION LAUNCH INITIATED ═══', 'warning');
-    addLog('SYSTEM', 'Multi-agent research task: "Analyze current web trends"', 'info');
+    const av = (window as any).__agentville;
     
-    const sequence = [
-      { delay: 400, agent: 'KAREN', msg: 'Initializing knowledge graph scan...', type: 'info' as const },
-      { delay: 800, agent: 'KAREN', msg: 'Found 1,247 relevant documents', type: 'success' as const },
-      { delay: 1200, agent: 'ALICE', msg: 'Pattern analysis in progress...', type: 'info' as const },
-      { delay: 1600, agent: 'ALICE', msg: 'Identified 3 emergent trends', type: 'success' as const },
-      { delay: 2000, agent: 'CHAD', msg: 'Generating code artifacts...', type: 'info' as const },
-      { delay: 2400, agent: 'CHAD', msg: 'Output: 847 lines across 3 files', type: 'success' as const },
-      { delay: 2800, agent: 'BOB', msg: 'Synthesizing final report...', type: 'info' as const },
-      { delay: 3200, agent: 'BOB', msg: 'Cross-referencing data sources', type: 'info' as const },
-      { delay: 3600, agent: 'SYSTEM', msg: '✓ Mission complete - Results aggregated', type: 'success' as const },
-      { delay: 3800, agent: 'SYSTEM', msg: 'Total execution time: 3.8s | Efficiency: 94.2%', type: 'info' as const },
-    ];
+    addLog('SYSTEM', '╔══════════════════════════════════════╗', 'warning');
+    addLog('SYSTEM', '║  OSINT RECONNAISSANCE MISSION       ║', 'warning');
+    addLog('SYSTEM', '║  Target: openclaw.ai infrastructure  ║', 'warning');
+    addLog('SYSTEM', '╚══════════════════════════════════════╝', 'warning');
+    addLog('SYSTEM', '', 'info');
+    
+    // Phase 1: Deployment
+    setTimeout(() => {
+      addLog('BOB', '→ Deploying agent swarm to target zone', 'info');
+      if (av) {
+        av.setAgentStatus('bob', 'working');
+        av.activateBuilding(3, true);
+      }
+    }, 300);
 
-    sequence.forEach(({ delay, agent, msg, type }) => {
-      setTimeout(() => addLog(agent, msg, type), delay);
-    });
+    // Phase 2: Karen - Research Lab
+    setTimeout(() => {
+      addLog('KAREN', '→ Moving to RESEARCH LAB', 'info');
+      if (av) {
+        av.moveAgent('karen', 80, 70, 'moving');
+        av.activateBuilding(0, true);
+      }
+    }, 600);
     
-    setTimeout(() => setMissionActive(false), 4000);
+    setTimeout(() => {
+      addLog('KAREN', '✓ Scanning public repositories and documentation', 'info');
+      if (av) av.setAgentStatus('karen', 'working');
+    }, 1100);
+    
+    setTimeout(() => {
+      addLog('KAREN', '✓ Found 47 public repos, 12 documentation sites', 'success');
+      addLog('KAREN', '✓ Extracted tech stack: Next.js, TypeScript, Tailwind', 'success');
+    }, 1800);
+
+    // Phase 3: Mallory - OSINT
+    setTimeout(() => {
+      addLog('MALLORY', '→ Deploying to INTEL CENTER', 'info');
+      if (av) {
+        av.moveAgent('mallory', 310, 365, 'moving');
+        av.activateBuilding(5, true);
+      }
+    }, 1400);
+    
+    setTimeout(() => {
+      addLog('MALLORY', '→ Querying Shodan, Censys, public DNS records', 'info');
+      if (av) av.setAgentStatus('mallory', 'working');
+    }, 2100);
+    
+    setTimeout(() => {
+      addLog('MALLORY', '✓ Discovered 3 public IPs, 8 subdomains', 'success');
+      addLog('MALLORY', '✓ SSL cert valid until 2026-11-14', 'success');
+    }, 2800);
+
+    // Phase 4: Eve - Security Analysis
+    setTimeout(() => {
+      addLog('EVE', '→ Moving to SECURE FACILITY', 'info');
+      if (av) {
+        av.moveAgent('eve', 310, 50, 'moving');
+        av.activateBuilding(4, true);
+      }
+    }, 2000);
+    
+    setTimeout(() => {
+      addLog('EVE', '→ Analyzing attack surface and vulnerabilities', 'info');
+      if (av) av.setAgentStatus('eve', 'working');
+    }, 2700);
+    
+    setTimeout(() => {
+      addLog('EVE', '⚠ Found exposed /.git directory (INFO)', 'warning');
+      addLog('EVE', '✓ No critical vulnerabilities detected', 'success');
+    }, 3400);
+
+    // Phase 5: Alice - Data Analysis
+    setTimeout(() => {
+      addLog('ALICE', '→ Proceeding to ANALYTICS HUB', 'info');
+      if (av) {
+        av.moveAgent('alice', 90, 345, 'moving');
+        av.activateBuilding(2, true);
+      }
+    }, 2400);
+    
+    setTimeout(() => {
+      addLog('ALICE', '→ Correlating findings, building attack graph', 'info');
+      if (av) av.setAgentStatus('alice', 'working');
+    }, 3100);
+    
+    setTimeout(() => {
+      addLog('ALICE', '✓ Mapped 12 potential entry points', 'success');
+      addLog('ALICE', '✓ Identified 3 high-value targets', 'success');
+    }, 3800);
+
+    // Phase 6: Chad - Execution
+    setTimeout(() => {
+      addLog('CHAD', '→ Moving to EXECUTION BAY', 'info');
+      if (av) {
+        av.moveAgent('chad', 535, 70, 'moving');
+        av.activateBuilding(1, true);
+      }
+    }, 3000);
+    
+    setTimeout(() => {
+      addLog('CHAD', '→ Generating proof-of-concept exploits', 'info');
+      if (av) av.setAgentStatus('chad', 'working');
+    }, 3700);
+    
+    setTimeout(() => {
+      addLog('CHAD', '✓ PoC ready: Git exposure → source leak', 'success');
+      addLog('CHAD', '✓ Estimated impact: LOW (public info only)', 'info');
+    }, 4400);
+
+    // Phase 7: Bob - Synthesis
+    setTimeout(() => {
+      addLog('BOB', '→ Consolidating all agent findings', 'info');
+      if (av) {
+        av.moveAgent('karen', 200, 200, 'moving');
+        av.moveAgent('mallory', 250, 200, 'moving');
+        av.moveAgent('eve', 300, 200, 'moving');
+        av.moveAgent('alice', 350, 200, 'moving');
+        av.moveAgent('chad', 400, 200, 'moving');
+        av.moveAgent('bob', 310, 230, 'moving');
+      }
+    }, 4600);
+    
+    setTimeout(() => {
+      addLog('BOB', '→ Generating final reconnaissance report', 'info');
+      if (av) av.setAgentStatus('bob', 'working');
+    }, 5200);
+
+    // Phase 8: Complete
+    setTimeout(() => {
+      addLog('SYSTEM', '', 'info');
+      addLog('SYSTEM', '╔══════════════════════════════════════╗', 'success');
+      addLog('SYSTEM', '║  MISSION COMPLETE                    ║', 'success');
+      addLog('SYSTEM', '╠══════════════════════════════════════╣', 'success');
+      addLog('SYSTEM', '║  Duration: 5.8s                      ║', 'success');
+      addLog('SYSTEM', '║  Agents deployed: 6/6                ║', 'success');
+      addLog('SYSTEM', '║  Data points collected: 1,247        ║', 'success');
+      addLog('SYSTEM', '║  Risk level: LOW                     ║', 'success');
+      addLog('SYSTEM', '║  Next action: Generate PDF report    ║', 'success');
+      addLog('SYSTEM', '╚══════════════════════════════════════╝', 'success');
+      
+      if (av) {
+        [0, 1, 2, 3, 4, 5].forEach(i => av.activateBuilding(i, false));
+        ['karen', 'chad', 'alice', 'bob', 'eve', 'mallory'].forEach(id => {
+          av.setAgentStatus(id, 'idle');
+        });
+        setTimeout(() => {
+          av.moveAgent('karen', 110, 160, 'idle');
+          av.moveAgent('chad', 235, 130, 'idle');
+          av.moveAgent('alice', 360, 165, 'idle');
+          av.moveAgent('bob', 485, 135, 'idle');
+          av.moveAgent('eve', 175, 285, 'idle');
+          av.moveAgent('mallory', 425, 290, 'idle');
+        }, 2000);
+      }
+      
+      setMissionActive(false);
+    }, 5800);
   };
 
   const desktopIcons: DesktopIcon[] = [
