@@ -514,7 +514,7 @@ export default function TownSquare() {
           
           if (dist > 3) {
             // WALKING - Very visible movement
-            const speed = 0.035; // Slower for visibility
+            const speed = 0.018; // ~3+ seconds across screen
             container.x += dx * speed;
             container.y += dy * speed;
             
@@ -528,9 +528,10 @@ export default function TownSquare() {
               });
             }
             
-            // Body bob
+            // Body bob - strong trail + exaggerated bob
+            const walk = Math.sin(time * 6);
             const body = container.children[3];
-            if (body) body.y = Math.abs(Math.sin(time * 10)) * 0.8;
+            if (body) body.y = walk * 1.8;
             
             // Arms swing opposite to legs
             const arms = container.getChildByName('arms') as PIXI.Container;
@@ -829,8 +830,10 @@ export default function TownSquare() {
         <div className="absolute bottom-2 left-2 right-2 z-20 pointer-events-none">
           <div className="bg-black/95 border-2 border-[#00ff00] p-2 backdrop-blur-sm">
             {(() => {
-              const agent = agents.find(a => a.id === selectedAgent)!;
-              const station = stations.find(s => s.agentId === agent.id)!;
+              const agent = agents.find(a => a.id === selectedAgent);
+              if (!agent) return null;
+              const station = stations.find(s => s.agentId === agent.id);
+              if (!station) return null;
               return (
                 <div className="font-mono text-[10px] leading-relaxed">
                   <div className="flex items-center justify-between mb-1 pb-1 border-b border-[#00ff00]/30">
@@ -886,8 +889,10 @@ export default function TownSquare() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
           <div className="bg-[#c0c0c0] border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,0.5)] p-3 min-w-[200px]">
             {(() => {
-              const station = stations.find(s => s.id === selectedStation)!;
-              const agent = agents.find(a => a.id === station.agentId)!;
+              const station = stations.find(s => s.id === selectedStation);
+              if (!station) return null;
+              const agent = agents.find(a => a.id === station.agentId);
+              if (!agent) return null;
               return (
                 <div className="font-mono text-[11px]">
                   <div className="flex items-center gap-2 pb-2 mb-2 border-b-2 border-[#808080]">
