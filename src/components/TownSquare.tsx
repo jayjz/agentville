@@ -136,13 +136,12 @@ export default function TownSquare() {
 
   const updateStationWork = useCallback((
     agent: Agent,
-    station: Station | undefined, // FIX 1: Accept undefined here so the caller doesn't throw type errors
+    station: Station | undefined, // Accepts undefined to satisfy strict compilation hooks
     stage: PIXI.Container,
     time: number,
     workEffects: PIXI.Container
   ): void => {
-    // FIX 2: Explicit early return guard. This acts as a hard type-narrowing boundary.
-    // TypeScript now knows that everywhere below this line, 'station' is 100% defined.
+    // Explicit early return acts as a hard boundary for TypeScript
     if (!station) return;
 
     const stationContainer = stage.getChildByName(station.id);
@@ -161,7 +160,7 @@ export default function TownSquare() {
       progressBar.clear();
       progressBar.beginFill(0x00ff00);
       
-      // FIX 3: Optional chaining (?.) and nullish coalescing (?? 0) guarantees a number.
+      // Using ?. and ?? 0 provides Vercel's compiler mathematical certainty
       progressBar.drawRect(8, (station?.h ?? 0) + 4, ((station?.w ?? 0) - 16) * (agent.workProgress / 100), 4);
       progressBar.endFill();
 
@@ -175,7 +174,7 @@ export default function TownSquare() {
       }
     }
 
-    // GLOW SECTION - Fully type-safe
+    // FIXED GLOW SECTION - Stronger null safety
     const glow = stationContainer.children.find((c): c is PIXI.Graphics =>
       c instanceof PIXI.Graphics &&
       c.name !== 'progressBg' &&
@@ -186,10 +185,8 @@ export default function TownSquare() {
       glow.clear();
       glow.beginFill(0x00ff00, 0.15 + Math.sin(time * 5) * 0.1);
       
-      // FIX 4: The exact line that caused the Vercel build to fail. 
-      // Using (station?.w ?? 0) satisfies TS by guaranteeing a numeric fallback.
+      // Safe fallback variables passed into drawRoundedRect
       glow.drawRoundedRect(-4, -4, (station?.w ?? 0) + 8, (station?.h ?? 0) + 8, 4);
-      
       glow.endFill();
     }
 
@@ -240,108 +237,6 @@ export default function TownSquare() {
         particle.drawCircle(0, 0, Math.random() * 2 + 1);
         particle.x = (station?.x ?? 0) + 15 + Math.random() * ((station?.w ?? 0) - 30);
         particle.y = (station?.y ?? 0) + 20 + Math.random() * 10;
-        particle.vy = -0.2 - Math.random() * 0.3;
-        particle.vx = (Math.random() - 0.5) * 0.5;
-        shouldAdd = true;
-        break;
-    }
-
-    if (shouldAdd) {
-      particle.life = 0;
-      particle.maxLife = 40 + Math.random() * 20;
-      workEffects.addChild(particle);
-    } else {
-      particle.destroy();
-    }
-  }, []);
-
-    // Progress bar
-    const progressBg = stationContainer.getChildByName('progressBg') as PIXI.Graphics | null;
-    const progressBar = stationContainer.getChildByName('progressBar') as PIXI.Graphics | null;
-
-    if (progressBg && progressBar) {
-      progressBg.visible = true;
-      progressBar.visible = true;
-      progressBar.clear();
-      progressBar.beginFill(0x00ff00);
-      progressBar.drawRect(8, station.h + 4, (station.w - 16) * (agent.workProgress / 100), 4);
-      progressBar.endFill();
-
-      if (agent.workProgress >= 100) {
-        setTimeout(() => {
-          progressBg.visible = false;
-          progressBar.visible = false;
-          const agentRef = agentsDataRef.current.find(a => a.id === agent.id);
-          if (agentRef) agentRef.workProgress = 0;
-        }, 500);
-      }
-    }
-
-    // FIXED GLOW SECTION - Stronger null safety
-    const glow = stationContainer.children.find((c): c is PIXI.Graphics =>
-      c instanceof PIXI.Graphics &&
-      c.name !== 'progressBg' &&
-      c.name !== 'progressBar'
-    );
-
-    if (glow && agent.workProgress > 0) {
-      // Explicit check + local variable for TypeScript narrowing
-      const currentStation = station;
-      if (currentStation) {
-        glow.clear();
-        glow.beginFill(0x00ff00, 0.15 + Math.sin(time * 5) * 0.1);
-        glow.drawRoundedRect(-4, -4, currentStation.w + 8, currentStation.h + 8, 4);
-        glow.endFill();
-      }
-    }
-
-    // Station-specific particles
-    if (Math.random() >= 0.4) return;
-
-    const particle = new PIXI.Graphics() as WorkParticle;
-    let shouldAdd = false;
-
-    switch (agent.id) {
-      case 'mallory':
-        particle.beginFill([0xffffff, 0xffff00, 0xffcc00][Math.floor(Math.random() * 3)], 0.9);
-        particle.drawRect(-1, -1, 2, 2);
-        particle.endFill();
-        particle.x = station.x + station.w / 2 + (Math.random() - 0.5) * 30;
-        particle.y = station.y + 25;
-        particle.vy = -1 - Math.random() * 2;
-        particle.vx = (Math.random() - 0.5) * 1.5;
-        shouldAdd = true;
-        break;
-      case 'alice':
-        particle.beginFill(0xffffff, 0.3 + Math.random() * 0.3);
-        particle.drawCircle(0, 0, Math.random() * 3 + 1);
-        particle.endFill();
-        particle.x = station.x + station.w / 2 + (Math.random() - 0.5) * 20;
-        particle.y = station.y + 15;
-        particle.vy = -0.5 - Math.random() * 0.5;
-        particle.vx = (Math.random() - 0.5) * 0.3;
-        shouldAdd = true;
-        break;
-      case 'chad':
-        if (Math.random() < 0.2) {
-          particle.beginFill(0xff4500, 0.2);
-          particle.drawCircle(0, 0, Math.random() * 4 + 2);
-          particle.endFill();
-          particle.x = station.x + station.w / 2;
-          particle.y = station.y + station.h - 10;
-          particle.vy = -0.3;
-          particle.vx = 0;
-          shouldAdd = true;
-        }
-        break;
-      case 'eve':
-        particle.beginFill(0x87ceeb, 0.6);
-        particle.drawCircle(0, 0, Math.random() * 2 + 1);
-        particle.endFill();
-        particle.lineStyle(1, 0xffffff, 0.8);
-        particle.drawCircle(0, 0, Math.random() * 2 + 1);
-        particle.x = station.x + 15 + Math.random() * (station.w - 30);
-        particle.y = station.y + 20 + Math.random() * 10;
         particle.vy = -0.2 - Math.random() * 0.3;
         particle.vx = (Math.random() - 0.5) * 0.5;
         shouldAdd = true;
