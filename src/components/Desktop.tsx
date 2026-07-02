@@ -570,9 +570,20 @@ export default function Desktop() {
                 )}
                 
                 {win.id === 'town' && (
-                  <div className="w-full h-full bg-[#008080] relative overflow-hidden">
-                    <div className="absolute inset-[2px] win95-border-inset bg-[#008080] overflow-hidden">
-                      <TownSquare />
+                <div className="w-full h-full bg-[#008080] relative overflow-hidden">
+                <div className="absolute inset-[2px] win95-border-inset bg-[#008080] overflow-hidden">
+                <TownSquare 
+  agents={[
+    { id: 'karen', name: 'Karen', role: 'Researcher', status: 'working', x: 150, y: 120, color: 0xff69b4, currentLine: 'Scanning repos...' },
+    { id: 'chad', name: 'Chad', role: 'Executor', status: 'idle', x: 350, y: 180, color: 0x00bfff, currentLine: 'Standing by' },
+    { id: 'mallory', name: 'Mallory', role: 'OSINT', status: 'working', x: 280, y: 280, color: 0x32cd32, currentLine: 'Querying...' },
+    { id: 'alice', name: 'Alice', role: 'Analyst', status: 'idle', x: 480, y: 150, color: 0xffa500, currentLine: 'Processing data' },
+  ]}
+  stations={[
+    { id: 'research', name: 'Research Lab', icon: '📚', x: 100, y: 100, width: 80, height: 60, color: 0x4169e1, progress: 0.65, active: true },
+    { id: 'exec', name: 'Execution Bay', icon: '⚡', x: 320, y: 80, width: 80, height: 60, color: 0xdc143c, progress: 0.4, active: true },
+  ]}
+/>
                       
                       {/* Overlay Info */}
                       <div className="absolute top-[4px] left-[4px] right-[4px] flex justify-between pointer-events-none">
